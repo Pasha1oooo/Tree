@@ -16,10 +16,10 @@ all: Tree
 	@echo "success"
 
 Tree: obj/Main.o obj/Tree.o
-	@g++ obj/Main.o obj/Tree.o -o run/tree -lm
+	@g++ ${CXXFLAGS} obj/Main.o obj/Tree.o -o run/tree -lm
 
 obj/Tree.o: tree/Tree.cpp tree/Tree.h
-	@g++ -c tree/Tree.cpp -o obj/Tree.o
+	@g++ ${CXXFLAGS} -c tree/Tree.cpp -o obj/Tree.o
 
 obj/Main.o: main/Main.cpp
-	@g++ -c main/Main.cpp -o obj/Main.o
+	@g++ ${CXXFLAGS} -c main/Main.cpp -o obj/Main.o

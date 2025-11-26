@@ -3,7 +3,6 @@
 
 #include <stdio.h>
 
-#define EXP 999
 
 typedef enum TYPE{
     OPERATOR = 0,
@@ -19,7 +18,9 @@ typedef enum OPERATION{
     POWER = 4,
     SINUS = 5,
     COSINUS = 6,
-    LOGARIFM = 7
+    LOGARIFM = 7,
+    EXP = 8,
+    PI = 9
 }OPERATION;
 
 typedef struct Node_t{
@@ -32,15 +33,15 @@ typedef struct Node_t{
 double DoOperation(Node_t * Node);
 OPERATION DefineOperation(char * str);
 double Solve(Node_t * Node);
-void PrintBaseToFile(Node_t * Node, FILE * fin);
+void PrintTreeToFile(Node_t * Node, FILE * fin);
 Node_t * NewNode(TYPE type, OPERATION value, Node_t * left, Node_t * right);
-Node_t * DiffTree2(Node_t * Node);
+Node_t * DiffTree(Node_t * Node);
 Node_t * CopyNode(Node_t * Node);
 Node_t * Optimize(Node_t * Node);
 
 void FreeTree(Node_t * Node);
-Node_t * LoadBase(char ** pos); // deserializer code
-void PrintBaseToFile(Node_t * Node, FILE * fin); // serializer
+Node_t * LoadBase(char ** pos, int * off); // deserializer code
+void PrintTreeToFile(Node_t * Node, FILE * fin); // serializer
 char * ReadFromFile(FILE * fin); //freadcalloc
 
 //функция поиска , дамп графиз

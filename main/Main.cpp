@@ -18,6 +18,7 @@ int main(int argc, char* argv[]){
     free(buff);
     printf("Loaded\n");
     Node_t * dtree = DiffTree(tree);
+    OptimizeTree(dtree);
     PrintTreeToFile(dtree , fout);
     printf("Solved\n");
     FreeTree(tree);

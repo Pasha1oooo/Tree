@@ -23,9 +23,15 @@ typedef enum OPERATION{
     PI = 9
 }OPERATION;
 
+typedef union Node_t_value{
+    OPERATION operation;
+    double    number;
+    int       variable;
+}Node_t_value;
+
 typedef struct Node_t{
     TYPE type;
-    OPERATION value;
+    Node_t_value value;
     Node_t * left;
     Node_t * right;
 }Node_t;
@@ -33,16 +39,18 @@ typedef struct Node_t{
 double DoOperation(Node_t * Node);
 OPERATION DefineOperation(char * str);
 double Solve(Node_t * Node);
-void PrintTreeToFile(Node_t * Node, FILE * fin);
-Node_t * NewNode(TYPE type, OPERATION value, Node_t * left, Node_t * right);
+
+
+Node_t * NewNode(TYPE type, Node_t_value value, Node_t * left, Node_t * right);
+
 Node_t * DiffTree(Node_t * Node);
 Node_t * CopyNode(Node_t * Node);
 Node_t * Optimize(Node_t * Node);
+Node_t * OptimizeTree(Node_t * Node);
 
 void FreeTree(Node_t * Node);
 Node_t * LoadBase(char ** pos, int * off); // deserializer code
 void PrintTreeToFile(Node_t * Node, FILE * fin); // serializer
 char * ReadFromFile(FILE * fin); //freadcalloc
-
 //функция поиска , дамп графиз
 #endif

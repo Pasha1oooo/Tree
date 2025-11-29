@@ -15,11 +15,11 @@ CXXFLAGS= -g -lm -D _DEBUG -ggdb3  -O0 -Wall -Wextra \
 all: Tree
 	@echo "success"
 
-Tree: obj/Main.o obj/Tree.o
-	@g++ ${CXXFLAGS} obj/Main.o obj/Tree.o -o run/tree -lm
+Tree: obj/Test.o obj/Tree.o
+	@g++ ${CXXFLAGS} obj/Test.o obj/Tree.o -o run/tree2 -lm
 
 obj/Tree.o: tree/Tree.cpp tree/Tree.h
 	@g++ ${CXXFLAGS} -c tree/Tree.cpp -o obj/Tree.o
 
-obj/Main.o: main/Main.cpp
-	@g++ ${CXXFLAGS} -c main/Main.cpp -o obj/Main.o
+obj/Test.o: main/Test.cpp
+	@g++ ${CXXFLAGS} -c main/Test.cpp -o obj/Test.o

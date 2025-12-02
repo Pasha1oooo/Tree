@@ -146,7 +146,6 @@ double DoOperation(Node_t * Node){
 }
 
 void PrintTreeToFile(Node_t * Node, FILE * fin){
-    printf("A");
     if(Node->type == NUMBER){
         if(Node->value.operation == EXP){
             fprintf(fin, "(e");

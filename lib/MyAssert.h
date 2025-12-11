@@ -1,7 +1,7 @@
 #ifndef MyAssert_H
 #define MyAssert_H
 
-#include "../COLORS.h"
+#include "COLORS.h"
 
 #define MyAssert(ARG)                                       \
     if(ARG){                                             \

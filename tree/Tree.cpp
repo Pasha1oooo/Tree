@@ -6,42 +6,14 @@
 #include "Tree.h"
 #include "../lib/MyAssert.h"
 //designeted initializers
+#define NUMBER_OF_OPERATIONS 10
+
 OPERATION DefineOperation(char * str){
-    //массив
-    const char * operations[] = {"+","-","*","/","^","sin","cos","ln","e","pi"};
-    if(strcmp(str,"+") == 0){
-        return PLUS;
-    }
-    else if(strcmp(str,"-") == 0){
-        return MINUS;
-    }
-    else if(strcmp(str,"*") == 0){
-        return MULTIPLE;
-    }
-    else if(strcmp(str,"/") == 0){
-        return DIVISION;
-    }
-    else if(strcmp(str,"^") == 0){
-        return POWER;
-    }
-    else if(strcmp(str,"sin") == 0){
-        return SINUS;
-    }
-    else if(strcmp(str,"cos") == 0){
-        return COSINUS;
-    }
-    else if(strcmp(str,"ln") == 0){
-        return LOGARIFM;
-    }
-    else if(strcmp(str,"e") == 0){
-        return EXP;
-    }
-    else if(strcmp(str,"pi") == 0){
-        return PI;
-    }
-    else{
-        printf("Undefined operation\n");
-        MyAssert(1 == 1);
+    const char * operations[NUMBER_OF_OPERATIONS] = {"+","-","*","/","^","sin","cos","ln","e","pi"};
+    for(int i = 0; i < NUMBER_OF_OPERATIONS; i++){
+        if(strcmp(str,operations[i]) == 0){
+            return (OPERATION)i;
+        }
     }
 }
 
@@ -53,49 +25,6 @@ char * ReadFromFile(FILE * fin){
     fread(ptr, sizeof(char), num,fin);
     ptr[num] = '\0';
     return ptr;
-}
-
-Node_t * LoadBase(char ** pos, int * off){
-    if(**pos == '#'){
-        return NULL;
-    }
-    else if(**pos == '('){
-        Node_t * Node = (Node_t*)calloc(1, sizeof(Node_t));
-        char * str = (char*)calloc(10, sizeof(char));                 //10
-        int i = 0;
-        (*pos)++;
-        (*off)++;
-        while((**pos != '#') && (**pos != '(')){
-            str[i] = **pos;
-            (*pos)++;
-            (*off)++;
-            i++;
-        }
-        if(**pos == '('){
-            printf("=========%s========\n", str);
-            Node->type = OPERATOR;
-            Node->value.operation = DefineOperation(str);
-        }
-        else if(**pos == '#'){
-            printf("=========%s========\n", str);
-            if(strcmp(str, "x") == 0){//////////////////////////////only x
-                Node->type = VARIBLE;
-                Node->value = (Node_t_value){.number=-1};
-            }
-            else{
-                Node->type = NUMBER;
-                Node->value.number = (OPERATION)atoi(str);
-            }
-        }
-        Node->left = LoadBase(pos, off);
-        (*pos)++;
-        (*off)++;
-        Node->right = LoadBase(pos, off);
-        (*pos)++;
-        (*off)++;
-        free(str);
-        return Node;
-    }
 }
 
 double Solve(Node_t * Node){
@@ -145,7 +74,7 @@ double DoOperation(Node_t * Node){
     }
 }
 
-void PrintTreeToFile(Node_t * Node, FILE * fin){
+void PrintTreeToFile(Node_t * Node, FILE * fin, variable variabls[]){
     if(Node->type == NUMBER){
         if(Node->value.operation == EXP){
             fprintf(fin, "(e");
@@ -157,8 +86,8 @@ void PrintTreeToFile(Node_t * Node, FILE * fin){
             fprintf(fin, "(%lg", Node->value.number);
         }
     }
-    else if(Node->type == VARIBLE){
-        fprintf(fin, "(x");
+    else if(Node->type == VARIABLE){
+        fprintf(fin, "(%s", variabls[Node->value.variable].name);
     }
     else if(Node->type == OPERATOR){
         switch(Node->value.operation){
@@ -186,19 +115,31 @@ void PrintTreeToFile(Node_t * Node, FILE * fin){
         case LOGARIFM:
             fprintf(fin, "(ln");
             break;
+        case EQUAL:
+            fprintf(fin, "(=");
+            break;
+        case IF:
+            fprintf(fin, "(if");
+            break;
+        case END:
+            fprintf(fin, "(;");
+            break;
+        case WHILE:
+            fprintf(fin, "(while");
+            break;
         default:
             fprintf(fin, "(");
             break;
         }
     }
     if (Node->left){
-        PrintTreeToFile(Node->left, fin);
+        PrintTreeToFile(Node->left, fin, variabls);
     }
     else{
         fprintf(fin, "#");
     }
     if (Node->right){
-        PrintTreeToFile(Node->right, fin);
+        PrintTreeToFile(Node->right, fin, variabls);
     }
     else{
         fprintf(fin, "#");
@@ -255,7 +196,7 @@ Node_t * DiffTree(Node_t * Node){
         }
         //printf("a\n");
         return Node;
-    case VARIBLE:
+    case VARIABLE:
         //free(Node);
         return NewNode(NUMBER, (Node_t_value){.number=1}, NULL, NULL);
     case NUMBER:
@@ -291,7 +232,6 @@ Node_t * OptimizeTree(Node_t * Node){
 }
 
 Node_t * Optimize(Node_t * Node){
-    //printf("ooo");
     if(Node->type == OPERATOR){
         if((Node->left->type == NUMBER) && (Node->right->type == NUMBER)){
             Node_t * tmp = NewNode(NUMBER, (Node_t_value){.number=DoOperation(Node)}, NULL, NULL);
@@ -324,18 +264,15 @@ Node_t * Optimize(Node_t * Node){
                 FreeTree(Node);
                 return tmp;
             }
+            if(Node->value.operation == POWER){
+                Node_t * tmp = Node->right;
+                FreeTree(Node);
+                return tmp;
+            }
             else{
                 return Node;
             }
         }
-        //else if ((Node->value.operation == MULTIPLE) && (Node->left->value.operation == DIVISION) && (Node->left->left->value == )){
-        //    if(Node->value.operation == MULTIPLE){
-        //        return Node->right;
-        //    }
-        //    else{
-        //        return Node;
-        //    }
-        //}
         if ((Node->right->value.number == 0) && (Node->right->type == NUMBER)){
             //return Node;
             if(Node->value.operation == MULTIPLE){
@@ -357,9 +294,13 @@ Node_t * Optimize(Node_t * Node){
                 return Node;
             }
         }
-        ///00000000////
         else if ((Node->right->value.number == 1) && (Node->right->type == NUMBER)){
             if(Node->value.operation == MULTIPLE){
+                Node_t * tmp = CopyNode(Node->left);
+                FreeTree(Node);
+                return tmp;
+            }
+            if(Node->value.operation == POWER){
                 Node_t * tmp = CopyNode(Node->left);
                 FreeTree(Node);
                 return tmp;

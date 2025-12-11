@@ -16,9 +16,9 @@ all: Tree
 	@echo "success"
 
 Tree: obj/Test.o obj/Tree.o
-	@g++ ${CXXFLAGS} obj/Test.o obj/Tree.o -o run/tree2 -lm
+	@g++ ${CXXFLAGS} obj/Test.o obj/Tree.o -o run/tree2 -lm -g
 
-obj/Tree.o: tree/Tree.cpp tree/Tree.h
+obj/Tree.o: tree/Tree.cpp tree/Tree.h lib/MyAssert.h lib/COLORS.h
 	@g++ ${CXXFLAGS} -c tree/Tree.cpp -o obj/Tree.o
 
 obj/Test.o: main/Test.cpp

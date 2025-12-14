@@ -4,17 +4,17 @@
 #include <math.h>
 
 #include "Tree.h"
-#include "../lib/MyAssert.h"
-//designeted initializers
-#define NUMBER_OF_OPERATIONS 10
+
+#define NUMBER_OF_OPERATIONS 12
 
 OPERATION DefineOperation(char * str){
-    const char * operations[NUMBER_OF_OPERATIONS] = {"+","-","*","/","^","sin","cos","ln","e","pi"};
+    const char * operations[NUMBER_OF_OPERATIONS] = {"+","-","*","/","^","sin","cos","ln","e","pi","=","if"};
     for(int i = 0; i < NUMBER_OF_OPERATIONS; i++){
         if(strcmp(str,operations[i]) == 0){
             return (OPERATION)i;
         }
     }
+    return UNKNOW;
 }
 
 char * ReadFromFile(FILE * fin){
@@ -87,6 +87,7 @@ void PrintTreeToFile(Node_t * Node, FILE * fin, variable variabls[]){
         }
     }
     else if(Node->type == VARIABLE){
+        printf("var===\n");
         fprintf(fin, "(%s", variabls[Node->value.variable].name);
     }
     else if(Node->type == OPERATOR){

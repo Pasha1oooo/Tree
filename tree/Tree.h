@@ -28,7 +28,9 @@ typedef enum OPERATION{
     END = 13,
     PAR_OPEN = 14,
     PAR_CLOSE = 15,
-    DOUBLE_EQUAL = 16
+    DOUBLE_EQUAL = 16,
+    DOLLAR = 17,
+    UNKNOW = 18
 }OPERATION;
 
 typedef union Node_t_value{

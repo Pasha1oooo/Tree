@@ -4,3 +4,7 @@
 10:05:01  ERROR: DeadCanary: attack to Stack from right or left  FILE: stack/Stack.cpp  FUNCTION: DoInstructions  LINE: 116
 10:05:01  ERROR: DeadCanary: attack to Stack from right or left  FILE: stack/Stack.cpp  FUNCTION: DoInstructions  LINE: 116
 10:05:01  ERROR: DeadCanary: attack to Stack from right or left  FILE: stack/Stack.cpp  FUNCTION: DoInstructions  LINE: 116
+10:05:01  ERROR: DeadCanary: attack to Stack from right or left  FILE: stack/Stack.cpp  FUNCTION: DoInstructions  LINE: 52
+10:05:01  ERROR: DeadCanary: attack to Stack from right or left  FILE: stack/Stack.cpp  FUNCTION: DoInstructions  LINE: 52
+10:05:01  ERROR: DeadCanary: attack to Stack from right or left  FILE: stack/Stack.cpp  FUNCTION: DoInstructions  LINE: 52
+10:05:01  ERROR: DeadCanary: attack to Stack from right or left  FILE: stack/Stack.cpp  FUNCTION: DoInstructions  LINE: 52

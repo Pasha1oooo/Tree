@@ -30,7 +30,9 @@ typedef enum OPERATION{
     PAR_CLOSE = 15,
     DOUBLE_EQUAL = 16,
     DOLLAR = 17,
-    UNKNOW = 18
+    UNKNOW = 18,
+    PAR_FIGUR_OPEN = 19,
+    PAR_FIGUR_CLOSE = 20
 }OPERATION;
 
 typedef union Node_t_value{
@@ -66,5 +68,5 @@ Node_t * OptimizeTree(Node_t * Node);
 void FreeTree(Node_t * Node);
 void PrintTreeToFile(Node_t * Node, FILE * fin, variable variabls[]); // serializer
 char * ReadFromFile(FILE * fin); //freadcalloc
-//Node_t * LoadBase(char ** pos, int * off); // deserializer code
+
 #endif

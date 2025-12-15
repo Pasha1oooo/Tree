@@ -33,7 +33,11 @@ int main(int argc, char* argv[]){
     Node_t * tokens = tokenss;
     lex(&s, tokenss);
     tokenss = tokens;
+    for(int i =0; i<5;i++) printf("main lex %d\n",tokenss[i].type);
+    for(int i =0; i<5;i++) printf("main lex %d\n",tokens[i].type);
     Node_t * tree = GetG(&tokenss);
+    printf("main lex %d %d\n",tree->type, tree->value.operation);
+    printf("=====main====== %d \n", tree->value.operation);
     if(tree == NULL){
         assert(1!=1);
     }
@@ -45,13 +49,15 @@ int main(int argc, char* argv[]){
 }
 
 Node_t * GetG(Node_t ** tokens){
-    printf("var %d\n", (*tokens)->type);
     Node_t * val = GetO(tokens);
-
-    printf("\n=====new_val=======\n");
-
-    printf("A %d\n", (*tokens)->type);
-    printf("A %d\n", (*tokens)->value.operation);
+    Node_t * new_val = GetO(tokens);
+    while(new_val != NULL){
+        printf("======== \n");
+        val = NewNode(OPERATOR, (Node_t_value){.operation = END}, val, new_val);
+        new_val = GetO(tokens);
+    }
+    printf("G %d\n", (*tokens)->type);
+    printf("G %d\n", (*tokens)->value.operation);
     if((*tokens)->value.operation != DOLLAR){
         assert(1!=1);
     }
@@ -76,7 +82,6 @@ Node_t * GetE(Node_t ** tokens){
         Node_t * val2 = GetT(tokens);
         if(val2 == NULL) return NULL;
         if(op == PLUS){
-        //printf("EE %d \n", op);
             val = NewNode(OPERATOR, (Node_t_value){.operation=PLUS}, val, val2);
         }
         else{
@@ -176,23 +181,31 @@ Node_t * GetA(Node_t ** tokens){
 
 Node_t * GetO(Node_t ** tokens){
     Node_t * val = {};
+    Node_t * new_val = {};
     val = GetA(tokens);
     if(val == NULL){
-        printf("=============================ia\n");
         val = GetI(tokens);
-        if(val == NULL){
-            printf("=============================i\n");
-            //val = GetI(tokens);
-            assert(1!=1);
-            return NULL;
+        if(val==NULL){
+            if((*tokens)->value.operation == PAR_FIGUR_OPEN){
+                (*tokens)++;
+                val= GetO(tokens);
+                if(val==NULL)return NULL;
+                //(*tokens)--;
+                printf("G %d\n", (*tokens)->type);
+                printf("G %d\n", (*tokens)->value.operation);
+                if((*tokens)->value.operation != PAR_FIGUR_CLOSE){
+                    assert(1!=1);
+                    return NULL;
+                }
+                (*tokens)++;
+
+            }
         }
-        (*tokens)-=1;
-        printf("A %d\n", (*tokens)->type);
-        printf("A %d\n", (*tokens)->value.operation);
         return val;
     }
     if((*tokens)->value.operation != END){
         printf("=============================e\n");
+        assert(1!=1);
         return NULL;
     }
     printf("=============================ok\n");
@@ -209,7 +222,7 @@ Node_t * GetI(Node_t ** tokens){
     if((*tokens)->value.operation == PAR_OPEN){
         val = NewNode(OPERATOR, (Node_t_value){.operation=IF}, NULL, NULL);
         (*tokens)++;
-        val->left = GetE(tokens);//GetE
+        val->left = GetE(tokens);//GetA
         if(val->left == NULL) assert(1!=1);
         if((*tokens)->value.operation != PAR_CLOSE){
             return NULL;
@@ -219,15 +232,14 @@ Node_t * GetI(Node_t ** tokens){
     else{
         return NULL;
     }
-    printf("\n=====if o\n");
     val->right = GetO(tokens);
-    if(val->right == NULL) assert(1!=1);
-    printf("\n=====if o end\n");
+    if(val->right == NULL) return NULL;
     (*tokens)++;
     return val;
 }
 
 size_t lex(const char ** s, Node_t * tokens){
+    printf("%s\n", *s);
     size_t n = 0;
     while(**s != '\0'){
         if(**s == '$') {
@@ -254,6 +266,22 @@ size_t lex(const char ** s, Node_t * tokens){
             (*s)++;
             continue;
         }
+        else if(**s == '{') {
+            printf("(lex) {\n");
+            tokens[n].type = OPERATOR;
+            tokens[n].value.operation = PAR_FIGUR_OPEN;
+            n++;
+            (*s)++;
+            continue;
+        }
+        else if(**s == '}') {
+            printf("(lex) }\n");
+            tokens[n].type = OPERATOR;
+            tokens[n].value.operation = PAR_FIGUR_CLOSE;
+            n++;
+            (*s)++;
+            continue;
+        }
         else if(**s == '=' && *(*s+1) == '=') {
             tokens[n].type = OPERATOR;
             tokens[n].value.operation = DOUBLE_EQUAL;
@@ -262,13 +290,15 @@ size_t lex(const char ** s, Node_t * tokens){
             continue;
         }
         else if(**s == ';') {
+            printf("(lex) ;\n");
             tokens[n].type = OPERATOR;
             tokens[n].value.operation = END;
             n++;
-            (*s)+=2;
+            (*s)++;
             continue;
         }
         else if(**s == '=') {
+            printf("(lex) =\n");
             tokens[n].type = OPERATOR;
             tokens[n].value.operation = EQUAL;
             n++;
@@ -345,13 +375,13 @@ size_t lex(const char ** s, Node_t * tokens){
                 sum = sum*10 + (**s - '0');
                 (*s)++;
             }
+            printf("(lex) %d\n", sum);
             tokens[n].type = NUMBER;
             tokens[n].value.number = sum;
             n++;
             continue;
         }
         else if(**s >= 'a' && **s <= 'z') {
-            printf("var lex\n");
             tokens[n].type = VARIABLE;
             int i = 0;
             char str[100];
@@ -360,7 +390,7 @@ size_t lex(const char ** s, Node_t * tokens){
                 i++;
                 (*s)++;
             }
-            printf("%s\n", str);
+            printf("lex %s\n", str);
             for(int i = 0; i < NUMBER_OF_VARIABLES; i++){
                 if(strcmp(str,variabls[i].name) == 0){
                     tokens[n].value.variable = i;
@@ -374,7 +404,9 @@ size_t lex(const char ** s, Node_t * tokens){
             continue;
         }
         else{
+            printf("(lex)skip %c\n", (**s));
             (*s)++;
+            continue;
         }
     }
     return NULL;

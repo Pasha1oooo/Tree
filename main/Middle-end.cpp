@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../tree/Tree.h"
-#define NUMBER_OF_VARIABLES 10
+#define NUMBER_OF_VARIABLES 100
 Node_t * LoadBase(char ** pos);
 void PrintASMToFile(Node_t * Node, FILE * fin);
 
@@ -10,9 +10,9 @@ variable variabls[NUMBER_OF_VARIABLES] = {};
 int variable_ptr = 0;
 
 int main(int argc, char* argv[]){
-    printf("afffff");
     FILE * fin = fopen(argv[1],"r");
     FILE * fout = fopen(argv[2],"w");
+    fprintf(fout, "INIT 10 \n");
     char * s = ReadFromFile(fin);
     char * str = s;
     Node_t * tree = LoadBase(&s);
@@ -49,15 +49,18 @@ Node_t * LoadBase(char ** pos){
             }
             else{
                 Node->type = VARIABLE;
-                int i = 0;
+                int i = 0, a = 0;
                 for(int i = 0; i < NUMBER_OF_VARIABLES; i++){
                     if(strcmp(str,variabls[i].name) == 0){
+                        a++;
                         Node->value.variable = i;
                     }
                 }
-                strcat(variabls[variable_ptr].name, str);
-                Node->value.variable = variable_ptr;
-                variable_ptr++;
+                if(a==0){
+                    strcat(variabls[variable_ptr].name, str);
+                    Node->value.variable = variable_ptr;
+                    variable_ptr++;
+                }
             }
         }
         free((char*)str);
@@ -72,7 +75,6 @@ Node_t * LoadBase(char ** pos){
 
 void PrintASMToFile(Node_t * Node, FILE * fin){
     if(Node != NULL){
-        //printf("%d\n", Node->value.operation);
         if(Node->type == OPERATOR && Node->value.operation == EQUAL){
             if(Node->left->type == VARIABLE){
                 PrintASMToFile(Node->right, fin);
@@ -85,11 +87,13 @@ void PrintASMToFile(Node_t * Node, FILE * fin){
         }
         if(Node->type == OPERATOR && Node->value.operation == IF){
             PrintASMToFile(Node->left, fin);
-            fprintf(fin, "JMP \n");
+            fprintf(fin, "PUSH 0\n");
+            fprintf(fin, "JNE :1\n");
             PrintASMToFile(Node->right, fin);
+            fprintf(fin, ":1\n");
         }
         if(Node->type == OPERATOR){
-            printf("oper\n");
+            printf("oper %d \n", Node->value.operation);
             switch(Node->value.operation){
             case PLUS:
                 PrintASMToFile(Node->left, fin);
@@ -115,6 +119,10 @@ void PrintASMToFile(Node_t * Node, FILE * fin){
                 PrintASMToFile(Node->left, fin);
                 PrintASMToFile(Node->right, fin);
                 fprintf(fin, "SIN \n");
+                break;
+            case END:
+                PrintASMToFile(Node->left, fin);
+                PrintASMToFile(Node->right, fin);
                 break;
             default:
                 fprintf(fin, "\n");

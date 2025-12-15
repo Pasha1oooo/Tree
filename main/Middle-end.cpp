@@ -75,6 +75,19 @@ Node_t * LoadBase(char ** pos){
 
 void PrintASMToFile(Node_t * Node, FILE * fin){
     if(Node != NULL){
+        if(Node->type == OPERATOR && Node->value.operation == DOUBLE_EQUAL){
+            if(Node->left->type == VARIABLE){
+                PrintASMToFile(Node->right, fin);
+                fprintf(fin, "POPM %d \n", Node->left->value.variable);
+            }
+            else if(Node->right->type == VARIABLE){
+                PrintASMToFile(Node->left, fin);
+                fprintf(fin, "POPM %d \n", Node->right->value.variable);
+            }
+            PrintASMToFile(Node->left, fin);
+            PrintASMToFile(Node->right, fin);
+            fprintf(fin, "SUB \n");
+        }
         if(Node->type == OPERATOR && Node->value.operation == EQUAL){
             if(Node->left->type == VARIABLE){
                 PrintASMToFile(Node->right, fin);

@@ -5,10 +5,10 @@
 
 #include "Tree.h"
 
-#define NUMBER_OF_OPERATIONS 14
+#define NUMBER_OF_OPERATIONS 15
 
 OPERATION DefineOperation(char * str){
-    const char * operations[NUMBER_OF_OPERATIONS] = {"+","-","*","/","^","sin","cos","ln","e","pi","=","if","while",";"};
+    const char * operations[NUMBER_OF_OPERATIONS] = {"+","-","*","/","^","sin","cos","ln","e","pi","=","if","while",";","=="};
     for(int i = 0; i < NUMBER_OF_OPERATIONS; i++){
         if(strcmp(str,operations[i]) == 0){
             return (OPERATION)i;
@@ -118,6 +118,9 @@ void PrintTreeToFile(Node_t * Node, FILE * fin, variable variabls[]){
             break;
         case EQUAL:
             fprintf(fin, "(=");
+            break;
+        case DOUBLE_EQUAL:
+            fprintf(fin, "(==");
             break;
         case IF:
             fprintf(fin, "(if");

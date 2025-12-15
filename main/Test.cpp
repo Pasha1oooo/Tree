@@ -12,6 +12,7 @@
 Node_t * GetG(Node_t ** tokens);  //проверяет коректность "$ в конце"
 Node_t * GetN(Node_t ** tokens);  //сканирует число
 Node_t * GetE(Node_t ** tokens);  //выражение '+' '-'
+Node_t * GetDA(Node_t ** tokens);
 Node_t * GetT(Node_t ** tokens);  //выражение '*' '/' '^'
 Node_t * GetP(Node_t ** tokens);  //или число или функция или переменная или скобочное выражение
 Node_t * GetV(Node_t ** tokens);  //переменная
@@ -91,6 +92,7 @@ Node_t * GetE(Node_t ** tokens){
     return val;
 }
 
+
 Node_t * GetT(Node_t ** tokens){
     Node_t * val = GetP(tokens);
     if(val == NULL) return NULL;
@@ -141,12 +143,8 @@ Node_t * GetP(Node_t ** tokens){
     else{
         val = GetN(tokens);
         if(val == NULL){
-            //int i=0;
-            //val = GetV(tokens,&i);
-            //if(val == NULL){
-                val = GetF(tokens);
-                if(val == NULL) return NULL;
-            //}
+            val = GetV(tokens);
+            if(val == NULL) return NULL;
         }
     }
 
@@ -176,6 +174,22 @@ Node_t * GetA(Node_t ** tokens){
         assert(1!=1);
     }
     return NewNode(OPERATOR, (Node_t_value){.operation=EQUAL}, val1, val2);
+}
+Node_t * GetDA(Node_t ** tokens){
+    printf("DA %d\n", (*tokens)->type);
+    Node_t * val1 = GetP(tokens);
+    if(val1 == NULL) return NULL;
+    Node_t * val2 = {};
+    if((*tokens)->value.operation == DOUBLE_EQUAL){
+        (*tokens)++;
+        val2 = GetP(tokens);
+        if(val2 == NULL) return NULL;
+    }
+    else{
+        return NULL;
+        assert(1!=1);
+    }
+    return NewNode(OPERATOR, (Node_t_value){.operation=DOUBLE_EQUAL}, val1, val2);
 }
 
 
@@ -222,7 +236,7 @@ Node_t * GetI(Node_t ** tokens){
     if((*tokens)->value.operation == PAR_OPEN){
         val = NewNode(OPERATOR, (Node_t_value){.operation=IF}, NULL, NULL);
         (*tokens)++;
-        val->left = GetE(tokens);//GetA
+        val->left = GetDA(tokens);//GetA
         if(val->left == NULL) assert(1!=1);
         if((*tokens)->value.operation != PAR_CLOSE){
             return NULL;

@@ -204,9 +204,6 @@ Node_t * GetO(Node_t ** tokens){
                 (*tokens)++;
                 val= GetO(tokens);
                 if(val==NULL)return NULL;
-                //(*tokens)--;
-                printf("G %d\n", (*tokens)->type);
-                printf("G %d\n", (*tokens)->value.operation);
                 if((*tokens)->value.operation != PAR_FIGUR_CLOSE){
                     assert(1!=1);
                     return NULL;
